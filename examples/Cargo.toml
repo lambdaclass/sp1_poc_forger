@@ -18,8 +18,6 @@ members = [
   "io/script",
   "is-prime/program",
   "is-prime/script",
-  "i-am-satoshi/program",
-  "i-am-satoshi/script",
   "json/lib",
   "json/program",
   "json/script",
