@@ -1378,7 +1378,8 @@ impl<'a> Executor<'a> {
 
         let done = self.state.pc == 0
             || self.state.pc.wrapping_sub(self.program.pc_base)
-                >= (self.program.instructions.len() * 4) as u32;
+                >= (self.program.instructions.len() * 4) as u32
+            || self.state.pc == 2100032; // The address of `main`; should maybe not be exactly hardcoded :)
         if done && self.unconstrained {
             log::error!("program ended in unconstrained mode at clk {}", self.state.global_clk);
             return Err(ExecutionError::EndInUnconstrained());
