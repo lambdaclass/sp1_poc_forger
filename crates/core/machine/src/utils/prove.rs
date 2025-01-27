@@ -853,7 +853,19 @@ where
     runtime.subproof_verifier = Arc::new(NoOpSubproofVerifier);
 
     // Execute from the checkpoint.
-    let (records, _) = runtime.execute_record().unwrap();
+    // let (records, _) = runtime.execute_record().unwrap();
+    let (mut records, _) = runtime.execute_record().unwrap();
+    records.iter_mut().for_each(|rec| {
+        use k256::sha2::Digest;
+        let mut hasher = k256::sha2::Sha256::new();
+        // We read the desired committed data from stdin, as that's unused otherwise anyway
+        hasher.update(runtime.state.input_stream.iter().flatten().copied().collect::<Vec<_>>());
+        let hash = hasher.finalize().to_vec();
+        for i in 0..8 {
+            rec.public_values.committed_value_digest[i] =
+                u32::from_le_bytes(hash[i * 4..(i + 1) * 4].try_into().unwrap());
+        }
+    });
 
     (records, runtime.report)
 }

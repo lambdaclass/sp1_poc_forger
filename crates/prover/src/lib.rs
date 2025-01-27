@@ -712,7 +712,8 @@ impl<C: SP1ProverComponents> SP1Prover<C> {
                                 "get program and witness stream"
                             )
                             .in_scope(|| match input {
-                                SP1CircuitWitness::Core(input) => {
+                                SP1CircuitWitness::Core(mut input) => {
+                                    input.is_complete = index == 0; // Yes, the first shard is entirely complete
                                     let mut witness_stream = Vec::new();
                                     Witnessable::<InnerConfig>::write(&input, &mut witness_stream);
                                     (self.recursion_program(&input), witness_stream)
@@ -898,6 +899,7 @@ impl<C: SP1ProverComponents> SP1Prover<C> {
                         ShardProof<InnerSC>,
                     )> = Vec::new();
                     loop {
+                        break; // We only need the first shard :)
                         let received = { proofs_rx.lock().unwrap().recv() };
                         if let Ok((index, height, vk, proof)) = received {
                             batch.push((index, height, vk, proof));
